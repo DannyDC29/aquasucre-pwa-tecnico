@@ -1,8 +1,55 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AquaSucre Técnico</title><link rel="manifest" href="/static/manifest.json"><link rel="stylesheet" href="/static/css/style.css"></head>
-<body><header><h1>AquaSucre</h1><small>Órdenes del técnico</small></header><main>
-<section id="login"><h2>Identificar técnico</h2><select id="tecnico"><option value="">Seleccione...</option></select><button onclick="entrar()">Entrar</button></section>
-<section id="lista" hidden><div class="bar"><h2>Mis órdenes</h2><button class="sec" onclick="salir()">Cambiar técnico</button></div><div id="ordenes"></div></section>
-<section id="detalle" hidden><button class="sec" onclick="volver()">← Volver</button><div id="datos"></div><button id="btnIniciar" onclick="iniciar()">Iniciar trabajo</button>
-<div id="form" hidden><label>Diagnóstico<textarea id="diagnostico"></textarea></label><label>Trabajo realizado<textarea id="trabajo"></textarea></label><label>Observaciones<textarea id="observaciones"></textarea></label><button onclick="guardar()">Guardar</button><button onclick="finalizar()">Finalizar trabajo</button></div></section>
-<p id="msg"></p></main><script src="/static/js/app.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>AquaSucre Técnico</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>AquaSucre</h1>
+        <small>Órdenes del técnico</small>
+    </header>
+    <main>
+        <section id="login">
+            <h2>Identificar técnico</h2>
+            <select id="tecnico"><option value="">Seleccione...</option></select>
+            <button onclick="entrar()">Entrar</button>
+        </section>
+        
+        <section id="lista" hidden>
+            <div class="bar">
+                <h2>Mis órdenes</h2>
+                <button class="sec" onclick="salir()">Cambiar técnico</button>
+            </div>
+            <div id="ordenes"></div>
+        </section>
+        
+        <section id="detalle" hidden>
+            <button class="sec" onclick="volver()">← Volver</button>
+            <div id="datos"></div>
+            <button id="btnIniciar" onclick="iniciar()">Iniciar trabajo</button>
+            
+            <div id="form" hidden style="margin-top: 15px; border-top: 2px solid #eee; padding-top: 10px;">
+                <h3>Bitácora de Trabajo en Campo</h3>
+                <label>Diagnóstico
+                    <textarea id="diagnostico" placeholder="Ej: Fuga detectada en la junta de acometida principal por desgaste de empaque."></textarea>
+                </label>
+                <label>Trabajo realizado
+                    <textarea id="trabajo" placeholder="Ej: Se realizó el reemplazo del empaque de compresión y ajuste de la rosca."></textarea>
+                </label>
+                <label>Observaciones
+                    <textarea id="observaciones" placeholder="Ej: Servicio de agua restablecido sin presencia de fugas adicionales."></textarea>
+                </label>
+                <button onclick="guardar()">Guardar Avance</button>
+                <button style="background-color: #28a745;" onclick="finalizar()">Finalizar Trabajo</button>
+            </div>
+        </section>
+        
+        <p id="msg"></p>
+    </main>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
