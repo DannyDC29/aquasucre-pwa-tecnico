@@ -26,43 +26,38 @@ def ordenes():
     with conexion() as cn, cn.cursor() as cur:
         cur.execute('''SELECT id_ot,id_pqr,tipo_servicio,descripcion,direccion,prioridad,estado,
                               fecha_inicio,fecha_finalizacion,diagnostico,trabajo_realizado,observaciones
-                       FROM ordenes_trabajo WHERE id_tecnico=%s
-                       ORDER BY fecha_creacion DESC''', (id_tecnico,))
+                       FROM ordenes_trabajo WHERE id_tecnico=%s OR id_tecnico::text=%s
+                       ORDER BY fecha_creacion DESC''', (id_tecnico, str(id_tecnico)))
         return jsonify(cur.fetchall())
 
 @app.post('/api/ordenes/<int:id_ot>/iniciar')
 def iniciar(id_ot):
-    data=request.get_json(silent=True) or {}
-    id_tecnico=data.get('id_tecnico')
     with conexion() as cn, cn.cursor() as cur:
-        cur.execute("""UPDATE ordenes_trabajo SET estado='EN_PROCESO', fecha_inicio=NOW()
-                       WHERE id_ot=%s AND id_tecnico=%s AND estado='ASIGNADA'
-                       RETURNING id_ot,estado,fecha_inicio""", (id_ot,id_tecnico))
-        fila=cur.fetchone()
-        if not fila: return jsonify({'error':'No se pudo iniciar la OT'}),409
+        cur.execute("UPDATE ordenes_trabajo SET estado='EN_PROCESO', fecha_inicio=NOW() WHERE id_ot=%s RETURNING id_ot,estado,fecha_inicio", (id_ot,))
+        fila = cur.fetchone()
+        if not fila: return jsonify({'error':'No se encontro la OT'}), 409
         cn.commit(); return jsonify(fila)
 
 @app.put('/api/ordenes/<int:id_ot>/reporte')
 def reporte(id_ot):
-    data=request.get_json(silent=True) or {}
+    data = request.get_json(silent=True) or {}
     with conexion() as cn, cn.cursor() as cur:
         cur.execute('''UPDATE ordenes_trabajo SET diagnostico=%s, trabajo_realizado=%s, observaciones=%s
-                       WHERE id_ot=%s AND id_tecnico=%s AND estado='EN_PROCESO' RETURNING id_ot''',
-                    (data.get('diagnostico'),data.get('trabajo_realizado'),data.get('observaciones'),id_ot,data.get('id_tecnico')))
-        if not cur.fetchone(): return jsonify({'error':'No se pudo guardar'}),409
+                       WHERE id_ot=%s RETURNING id_ot''',
+                    (data.get('diagnostico'), data.get('trabajo_realizado'), data.get('observaciones'), id_ot))
+        if not cur.fetchone(): return jsonify({'error':'No se pudo guardar'}), 409
         cn.commit(); return jsonify({'ok':True})
 
 @app.post('/api/ordenes/<int:id_ot>/finalizar')
 def finalizar(id_ot):
-    data=request.get_json(silent=True) or {}
+    data = request.get_json(silent=True) or {}
     with conexion() as cn, cn.cursor() as cur:
         cur.execute('''UPDATE ordenes_trabajo SET diagnostico=%s, trabajo_realizado=%s, observaciones=%s,
                        estado='FINALIZADA', fecha_finalizacion=NOW()
-                       WHERE id_ot=%s AND id_tecnico=%s AND estado='EN_PROCESO'
-                       RETURNING id_ot,estado,fecha_finalizacion''',
-                    (data.get('diagnostico'),data.get('trabajo_realizado'),data.get('observaciones'),id_ot,data.get('id_tecnico')))
-        fila=cur.fetchone()
-        if not fila: return jsonify({'error':'No se pudo finalizar'}),409
+                       WHERE id_ot=%s RETURNING id_ot,estado,fecha_finalizacion''',
+                    (data.get('diagnostico'), data.get('trabajo_realizado'), data.get('observaciones'), id_ot))
+        fila = cur.fetchone()
+        if not fila: return jsonify({'error':'No se pudo finalizar'}), 409
         cn.commit(); return jsonify(fila)
 
-if __name__ == '__main__': app.run(host='0.0.0.0', port=int(os.environ.get('PORT',5000)))
+if __name__ == '__main__': app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
